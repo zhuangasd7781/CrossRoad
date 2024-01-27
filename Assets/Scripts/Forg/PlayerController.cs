@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Properties;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class PlayerController : MonoBehaviour
     private bool buttonHeld;
     private bool isJumpping;
     private bool canJump;
+    private SpriteRenderer sr;
 
     private Vector2 destination;
     private Vector2 touchPosition;
@@ -28,6 +30,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
     }
     void Update()
     {
@@ -40,6 +43,19 @@ public class PlayerController : MonoBehaviour
     {
         if (isJumpping)
             rb.position = Vector2.Lerp(transform.position, destination, 0.134f);
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Border"))
+        {
+            Debug.Log("Game over");
+        }
+
+        if (isJumpping == false && collision.CompareTag("Obstacle"))
+        {
+            Debug.Log("Game over");
+        }
     }
 
     #region INPUT 輸入回調函數
@@ -101,23 +117,30 @@ public class PlayerController : MonoBehaviour
     {
         // 改變狀態
         isJumpping = true;
-        Debug.Log(dir);
-        switch (dir)
-        {
-            case Direction.Up:
-                destination = new Vector2(transform.position.x, transform.position.y + moveDistance);
-                break;
-            case Direction.Right:
-                destination = new Vector2(transform.position.x + moveDistance, transform.position.y);
-                break;
-            case Direction.Left:
-                destination = new Vector2(transform.position.x - moveDistance, transform.position.y);
-                break;
-        }
+
+        //修改排序圖層
+        sr.sortingLayerName = "Front";
+
+        //Debug.Log(dir);
+        //switch (dir)
+        //{
+        //    case Direction.Up:
+        //        
+        //        destination = new Vector2(transform.position.x, transform.position.y + moveDistance);
+        //        break;
+        //    case Direction.Right:
+        //        destination = new Vector2(transform.position.x + moveDistance, transform.position.y);
+        //        break;
+        //    case Direction.Left:
+        //        destination = new Vector2(transform.position.x - moveDistance, transform.position.y);
+        //        break;
+        //}
     }
     public void FinishJumpAnimationEvent()
     {
         isJumpping = false;
+        //修改排序圖層
+        sr.sortingLayerName = "Middle";
     }
     #endregion
 
@@ -131,13 +154,19 @@ public class PlayerController : MonoBehaviour
         {
             case Direction.Up:
                 // to do : 觸發切換左右方向動畫
+                anim.SetBool("isSide", false);
                 destination = new Vector2(transform.position.x, transform.position.y + moveDistance);
+                transform.localScale = Vector3.one;
                 break;
             case Direction.Right:
+                anim.SetBool("isSide", true);
+                transform.localScale = new Vector3(-1, 1, 1);
                 destination = new Vector2(transform.position.x + moveDistance, transform.position.y);
                 break;
             case Direction.Left:
+                anim.SetBool("isSide", true);
                 destination = new Vector2(transform.position.x - moveDistance, transform.position.y);
+                transform.localScale = Vector3.one;
                 break;
         }
 
