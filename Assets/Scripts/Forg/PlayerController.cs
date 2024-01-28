@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.CompareTag("Border"))
+        if (collision.CompareTag("Border") || collision.CompareTag("Car"))
         {
             Debug.Log("Game over");
         }
