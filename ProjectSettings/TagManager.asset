@@ -8,6 +8,7 @@ TagManager:
   - Obstacle
   - Car
   - Wood
+  - Water
   layers:
   - Default
   - TransparentFX

@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 touchPosition;
     private Direction dir;
 
+    private RaycastHit2D[] result = new RaycastHit2D[2];
     void Start()
     {
 
@@ -47,6 +48,22 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
+        if (collision.CompareTag("Water") && !isJumpping)
+        {
+            Physics2D.RaycastNonAlloc(transform.position + (Vector3.up * 0.1f), Vector2.zero, result);
+            foreach (var hit in result)
+            {
+                if (hit.collider == null) continue;
+                if (hit.collider.CompareTag("Wood"))
+                {
+                    //TODO:跟隨木板移動
+                    Debug.Log("在木板上");
+                }
+            }
+
+            //沒有木板 遊戲結束
+        }
+
         if (collision.CompareTag("Border") || collision.CompareTag("Car"))
         {
             Debug.Log("Game over");
