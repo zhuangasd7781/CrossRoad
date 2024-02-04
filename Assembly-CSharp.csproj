@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Camera\CameraControl.cs" />
     <Compile Include="Assets\Scripts\Forg\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\Gameplay\Spawner.cs" />
     <Compile Include="Assets\Scripts\Gameplay\MoveForward.cs" />
   </ItemGroup>
   <ItemGroup>
