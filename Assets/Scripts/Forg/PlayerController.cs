@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
+    public TerrainManager terrainManager;
     private enum Direction { Left, Right, Up }
 
     private Rigidbody2D rb;
@@ -21,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 destination;
     private Vector2 touchPosition;
     private Direction dir;
+    private bool isDead;
 
     private RaycastHit2D[] result = new RaycastHit2D[2];
     void Start()
@@ -51,28 +53,48 @@ public class PlayerController : MonoBehaviour
         if (collision.CompareTag("Water") && !isJumpping)
         {
             Physics2D.RaycastNonAlloc(transform.position + (Vector3.up * 0.1f), Vector2.zero, result);
+
+            bool inWater = true;
+
             foreach (var hit in result)
             {
                 if (hit.collider == null) continue;
                 if (hit.collider.CompareTag("Wood"))
                 {
                     //TODO:跟隨木板移動
-                    Debug.Log("在木板上");
+                    //Debug.Log("在木板上");
+                    transform.parent = hit.collider.transform;
+                    inWater = false;
                 }
             }
 
             //沒有木板 遊戲結束
+            if (inWater && !isJumpping)
+            {
+                Debug.Log("In Water GameOver");
+                isDead = true;
+            }
         }
 
         if (collision.CompareTag("Border") || collision.CompareTag("Car"))
         {
-            Debug.Log("Game over");
+            Debug.Log("Border Car Game over");
+            isDead = true;
         }
 
         if (isJumpping == false && collision.CompareTag("Obstacle"))
         {
-            Debug.Log("Game over");
+            Debug.Log("Obstacle Game over");
+            isDead = true;
         }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        //if (collision.CompareTag("Wood"))
+        //{
+        //    transform.parent = null;
+        //}
     }
 
     #region INPUT 輸入回調函數
@@ -138,6 +160,9 @@ public class PlayerController : MonoBehaviour
         //修改排序圖層
         sr.sortingLayerName = "Front";
 
+        //
+        transform.parent = null;
+
         //Debug.Log(dir);
         //switch (dir)
         //{
@@ -158,6 +183,12 @@ public class PlayerController : MonoBehaviour
         isJumpping = false;
         //修改排序圖層
         sr.sortingLayerName = "Middle";
+
+        if (dir == Direction.Up && !isDead)
+        {
+            // to do 得分 + 地圖檢測
+            terrainManager.CheckPosition();
+        }
     }
     #endregion
 

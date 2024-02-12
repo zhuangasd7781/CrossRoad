@@ -13,11 +13,9 @@ public class Spawner : MonoBehaviour
     private void Spawn()
     {
         var index = Random.Range(0, spawnerObjects.Count);
-        var car = Instantiate(spawnerObjects[index], transform.position, Quaternion.identity, transform);
+        var target = Instantiate(spawnerObjects[index], transform.position, Quaternion.identity, transform);
 
-        car.GetComponent<MoveForward>().dir = direction;
-        
-
+        target.GetComponent<MoveForward>().dir = direction;
     }
 
 }
